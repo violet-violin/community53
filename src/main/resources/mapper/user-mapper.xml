@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--user-mapper.xml 相当于接口UserMapper的实现类-->
+<mapper namespace="com.ly.community53.dao.UserMapper">
+
+    <!--    定义要插入的字段-->
+    <sql id="insertFields">
+        username, password, salt, email, type, status, activation_code, header_url, create_time
+    </sql>
+
+    <!--    定义要查询的字段-->
+    <sql id="selectFields">
+        id, username, password, salt, email, type, status, activation_code, header_url, create_time
+    </sql>
+
+    <!--    查询语句-->
+    <select id="selectById" resultType="User">
+        select
+        <include refid="selectFields"></include>
+        from user
+        where id = #{id}
+    </select>
+
+    <select id="selectByName" resultType="User">
+        select
+        <include refid="selectFields"></include>
+        from user
+        where username = #{username}
+    </select>
+
+    <select id="selectByEmail" resultType="User">
+        select
+        <include refid="selectFields"></include>
+        from user
+        where email = #{email}
+    </select>
+
+    <!--    增删改语句-->
+    <!--    parameterType：声明形参类型；  因为形参是Bean,而非简单类型，故要声明；
+        keyProperty：告诉mysql自增的id对应的是User类的“id”属性
+        #{username}：引用“User”的属性来插入-->
+    <insert id="insertUser" parameterType="User" keyProperty="id">
+        insert into user (<include refid="insertFields"></include>)
+        values(#{username}, #{password}, #{salt}, #{email}, #{type}, #{status}, #{activationCode}, #{headerUrl},
+        #{createTime})
+    </insert>
+
+    <update id="updateStatus">
+        update user set status = #{status} where id = #{id}
+    </update>
+
+    <update id="updateHeader">
+        update user set header_url = #{headerUrl} where id = #{id}
+    </update>
+
+    <update id="updatePassword">
+        update user set password = #{password} where id = #{id}
+    </update>
+
+</mapper>
