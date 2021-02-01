@@ -1,3 +1,5 @@
+var CONTEXT_PATH = "/community53";
+
 window.alert = function(message) {
 	if(!$(".alert-box").length) {
 		$("body").append(

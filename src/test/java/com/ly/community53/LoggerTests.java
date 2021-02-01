@@ -1,5 +1,6 @@
 package com.ly.community53;
 
+import com.ly.community53.util.CommunityUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -27,6 +28,11 @@ public class LoggerTests {
         logger.info("info log");
         logger.warn("warn log");
         logger.error("error log");
+    }
+
+    @Test
+    public void testMD5() {
+        System.out.println(CommunityUtil.md5("12345678" + "3c14d"));
     }
 
 }

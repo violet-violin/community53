@@ -13,7 +13,7 @@ public class Page {
     private int limit = 10;
     // 数据总数(用于计算总页数)
     private int rows;
-    // 查询路径(用于复用分页链接)
+    // 查询路径(用于复用分页链接)  , 啥？ 确实用分页确实有复用的必要，这样才能跳转
     private String path;
 
     public int getCurrent() {

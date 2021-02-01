@@ -15,8 +15,8 @@ public class User {
     private String password;
     private String salt;
     private String email;
-    private int type;
-    private int status;
+    private int type;//用户类型：1-管理员；2-版主；默认0-普通用户
+    private int status;//用户是否已激活
     private String activationCode;
     private String headerUrl;
     private Date createTime;

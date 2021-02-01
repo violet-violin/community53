@@ -1,14 +1,17 @@
 package com.ly.community53.controller;
 
 import com.ly.community53.service.AlphaService;
+import com.ly.community53.util.CommunityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -165,4 +168,60 @@ public class AlphaController {
 
         return list;
     }
+
+    // cookie示例
+
+    @RequestMapping(path = "/cookie/set", method = RequestMethod.GET)
+    @ResponseBody
+    public String setCookie(HttpServletResponse response) {
+        // 创建cookie
+        Cookie cookie = new Cookie("code", CommunityUtil.generateUUID());
+        // 设置cookie生效的范围，声明cookie在哪些路径下有效
+        cookie.setPath("/community53/alpha");
+        //默认：cookie是存在浏览器的内存里，一旦关闭浏览器就没了。设置生存时间后会存在硬盘
+        // 设置cookie的生存时间
+        cookie.setMaxAge(60 * 10);
+        // 发送cookie
+        response.addCookie(cookie);
+
+        return "set cookie";
+    }
+
+    @RequestMapping(path = "/cookie/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getCookie(@CookieValue("code") String code) {//@CookieValue("code") ，从cookie中取key为code的值赋给形参
+        System.out.println(code);
+        return "get cookie";
+    }
+
+    //cookie局限：存在客户端，不安全；每次请求都带上，给服务器带来流量压力。
+    //session局限：服务端内存压力大；   隐私数据就存session
+    //用session,它不是http协议的标准，是JavaEE的标准
+    // session示例
+
+    @RequestMapping(path = "/session/set", method = RequestMethod.GET)
+    @ResponseBody
+    public String setSession(HttpSession session) {//springmvc自动创建session对象，就像model这些
+        session.setAttribute("id", 1);//session存什么数据都行；cookie只能存少量数据、字符串
+        session.setAttribute("name", "Test");
+        return "set session";
+    }
+
+    @RequestMapping(path = "/session/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getSession(HttpSession session) {//session对象也是springmvc自动注入
+        System.out.println(session.getAttribute("id"));
+        System.out.println(session.getAttribute("name"));
+        return "get session";
+    }
+
+    // ajax示例
+    @RequestMapping(path = "/ajax", method = RequestMethod.POST)
+    @ResponseBody
+    public String testAjax(String name, int age) {
+        System.out.println(name);
+        System.out.println(age);
+        return CommunityUtil.getJSONString(0, "操作成功!");
+    }
+
 }
