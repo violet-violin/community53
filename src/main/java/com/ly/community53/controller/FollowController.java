@@ -37,11 +37,11 @@ public class FollowController implements CommunityConstant {
 
 
     @RequestMapping(path = "/follow", method = RequestMethod.POST)
-    @ResponseBody
+    @ResponseBody        // 又是异步请求
     public String follow(int entityType, int entityId) {
         User user = hostHolder.getUser();
 
-        //todo 该功能应登录后使用，使用拦截器实现
+        //todo 该follow功能应登录后使用，使用拦截器实现
         //拦截器实现—（implements HandlerInterceptor、implements WebMvcConfigurer做配置）；
         //像下面这样if判断行吗？
 //        if (user == null) {
@@ -57,7 +57,7 @@ public class FollowController implements CommunityConstant {
                 .setUserId(hostHolder.getUser().getId())
                 .setEntityType(entityType)
                 .setEntityId(entityId)
-                .setEntityUserId(entityId);//关注事件，没存postId，它不像赞、评论一样，有作用的帖子
+                .setEntityUserId(entityId);  //关注事件，没存postId，它不像赞、评论一样，有作用的帖子
         eventProducer.fireEvent(event);//生产者，事件发布
 
 
@@ -65,7 +65,7 @@ public class FollowController implements CommunityConstant {
     }
 
     @RequestMapping(path = "/unfollow", method = RequestMethod.POST)
-    @ResponseBody
+    @ResponseBody     // 又是异步请求
     public String unfollow(int entityType, int entityId) {
         User user = hostHolder.getUser();
 
@@ -87,7 +87,7 @@ public class FollowController implements CommunityConstant {
         }
         model.addAttribute("user", user);
 
-        page.setLimit(5);
+        page.setLimit(5);   // 每页显示5个 关注的博主
         page.setPath("/followees/" + userId);
         page.setRows((int) followService.findFolloweeCount(userId, ENTITY_TYPE_USER));
 
@@ -95,7 +95,7 @@ public class FollowController implements CommunityConstant {
         if (userList != null) {
             for (Map<String, Object> map : userList) {
                 User u = (User) map.get("user");  //这里的u,全是userId关注的人
-                map.put("hasFollowed", hasFollowed(u.getId()));  //这里岂非全是true
+                map.put("hasFollowed", hasFollowed(u.getId()));  //这里岂非全是true，对
             }
         }
         model.addAttribute("users", userList);

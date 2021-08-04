@@ -85,7 +85,7 @@ public class AlphaController {
         return "a student";
     }
 
-    // POST请求；用表单提交——static.html下student.html
+    // POST请求；先url栏到达http://localhost:8080/html/student.html；再用表单提交——static下student.html
     //一般get缺陷：地址栏上明面传；地址栏长度有限
     @RequestMapping(path = "/student", method = RequestMethod.POST)
     @ResponseBody
@@ -94,7 +94,6 @@ public class AlphaController {
         System.out.println(age);
         return "success";
     }
-
     // 响应HTML数据：模板在 ——> template.demo下的view.html
     //会把ModelAndView传给模板引擎，进行渲染
     /**
@@ -201,7 +200,7 @@ public class AlphaController {
 
     @RequestMapping(path = "/session/set", method = RequestMethod.GET)
     @ResponseBody
-    public String setSession(HttpSession session) {//springmvc自动创建session对象，就像model这些
+    public String setSession(HttpSession session) {//springmvc自动创建session对象，就像model这些；直接声明一个形参用就行
         session.setAttribute("id", 1);//session存什么数据都行；cookie只能存少量数据、字符串
         session.setAttribute("name", "Test");
         return "set session";

@@ -2,7 +2,7 @@
 <configuration>
     <contextName>community</contextName>
 <!--    日志文件存储地址-->
-    <property name="LOG_PATH" value="D:/temp/logdata"/>
+    <property name="LOG_PATH" value="/tmp"/>
     <property name="APPDIR" value="community"/>
 
     <!-- error file -->

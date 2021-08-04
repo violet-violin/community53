@@ -31,7 +31,7 @@ public class DiscussPostService {
     @Autowired
     private DiscussPostMapper discussPostMapper;
     @Autowired
-    private SensitiveFilter sensitiveFilter;
+    private SensitiveFilter sensitiveFilter;  // SensitiveFilter 使用前缀树过滤敏感词
 
     @Value("${caffeine.posts.max-size}")
     private int maxSize;// 缓存15个数据，就是15页的帖子
@@ -47,7 +47,7 @@ public class DiscussPostService {
     // 帖子总数缓存
     private LoadingCache<Integer, Integer> postRowsCache;
 
-    @PostConstruct
+    @PostConstruct // 要在依赖加载后，对象使用前执行，而且只执行一次
     public void init() {
         // 初始化帖子列表缓存
         postListCache = Caffeine.newBuilder()
@@ -57,7 +57,7 @@ public class DiscussPostService {
                     @Nullable
                     @Override
                     public List<DiscussPost> load(@NonNull String key) throws Exception {
-                        //key从哪来？？postListCache.get(offset + ":" + limit); 第一次没在本地缓存，key就建立了？？
+                        //key从哪来？？postListCache.get(offset + ":" + limit); 第一次没在本地缓存，key就建立了，见下面findDiscussPosts()方法
                         if (key == null || key.length() == 0) {
                             throw new IllegalArgumentException("参数错误!");
                         }
@@ -70,8 +70,9 @@ public class DiscussPostService {
                         int offset = Integer.valueOf(params[0]);
                         int limit = Integer.valueOf(params[1]);
 
-                        // todo 做一层二级缓存Redis，二级缓存: Redis -> mysql
+                        // todo 做一层 二级缓存Redis，二级缓存: Redis -> mysql
                         //去redis查，redis查不到，再去DB
+                        // cao，我没做redis二级缓存！！！！！！！！
 
                         logger.debug("load post list from DB.");
                         return discussPostMapper.selectDiscussPosts(0, offset, limit, 1);
@@ -95,17 +96,18 @@ public class DiscussPostService {
 
 
     public List<DiscussPost> findDiscussPosts(int userId, int offset, int limit, int orderMode) {
-        if (userId == 0 && orderMode == 1) { //userId == 0；就不按userId来查；orderMode == 1 就是查热门贴;缓存只适用于这一个场景
-            return postListCache.get(offset + ":" + limit);
+        //userId == 0；就不按userId来查，即查询所有用户的帖子；orderMode == 1 就是查热门贴;缓存只适用于这一个场景——> 即热门帖子查询
+        if (userId == 0 && orderMode == 1) {
+            return postListCache.get(offset + ":" + limit);  // 从caffeine缓存中获取
         }
 
-        logger.debug("load post list from DB.");
+        logger.debug("load post list from DB."); // 下面就从DB获取数据，做个提示
 
         return discussPostMapper.selectDiscussPosts(userId, offset, limit, orderMode);
     }
 
-    public int findDiscussPostRows(int userId) { //上面查帖子做本地缓存，我懂；这里查个帖子总数，还做本地缓存，why？？
-        if (userId == 0) {
+    public int findDiscussPostRows(int userId) { //上面查帖子做本地缓存，我懂；这里查个所有帖子总数，还做本地缓存，干啥用的？
+        if (userId == 0) {  // == 0 就是查所有用户发帖数量
             return postRowsCache.get(userId); //本来不用传值进去的。但是get方法要求传入一个值，就把userId传入（就是0）
         }
 

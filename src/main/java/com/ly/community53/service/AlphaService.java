@@ -64,7 +64,7 @@ public class AlphaService {
     }
 
 
-    // spring事务管理demo：声明式事务
+    // spring事务管理：声明式事务demo
     //    - 通过XML配置，声明某方法的事务特征。
     //    - 通过注解，声明某方法的事务特征。@Transactional，声明两个参数，事务隔离级别、事务传播机制
 
@@ -98,7 +98,7 @@ public class AlphaService {
         post.setCreateTime(new Date());
         discussPostMapper.insertDiscussPost(post);
 
-        Integer.valueOf("abc");//故意报错的语句
+        Integer.valueOf("abc");//故意报错的语句；"123" 的形参才能正确执行
 
         return "ok";
     }
@@ -143,7 +143,7 @@ public class AlphaService {
         logger.debug("execute1");
     }
 
-    //让该方法延时10s执行，定时1s执行；只要有方法在跑，该方法会自动去调用
+    //让该方法延时10s执行，定时1s执行；只要项目中有方法在跑，该方法会自动去调用
     //这是个定时任务，一启动程序就触发，故注掉
 //    @Scheduled(initialDelay = 10000, fixedRate = 1000)
 //    public void execute2() {

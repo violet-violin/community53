@@ -25,7 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
         web.ignoring().antMatchers("/resources/**");
     }
 
-    @Override  //////授权的方法:user、admin、moderator
+    @Override  //////授权的方法:user、admin、moderator  （包含登录、退出、授权、验证码处理、记住我等功能）
     protected void configure(HttpSecurity http) throws Exception {
         // 授权，这些路径要————user、admin、moderator
         http.authorizeRequests()
@@ -66,7 +66,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                         AUTHORITY_ADMIN
                 )
                 .anyRequest().permitAll()
-                .and().csrf().disable();  //不启用防止csrf攻击功能; //想做的话就挨个来，就是因为麻烦，视频没做csrf检查
+                .and().csrf().disable();//不启用防止csrf攻击功能;
+        // 想做的话就每个异步请求功能挨个来，就是因为麻烦，视频没做csrf检查，只举了个例子
+        // 对于每一个同步请求post，就会自动发一个token到表单，每次提交表单都会带上cookie、token；防止csrf攻击；
+        // 对于每一个异步请求post，都要如上面这样处理，处理完成后，每次异步请求也会带上这个cookie、token，防止csrf攻击；
 
         // 权限不够时的处理
         http.exceptionHandling()
@@ -90,7 +93,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                     @Override
                     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException, ServletException {
                         String xRequestedWith = request.getHeader("x-requested-with");
-                        if ("XMLHttpRequest".equals(xRequestedWith)) {
+                        if ("XMLHttpRequest".equals(xRequestedWith)) { // 异步请求
                             response.setContentType("application/plain;charset=utf-8");
                             PrintWriter writer = response.getWriter();
                             writer.write(CommunityUtil.getJSONString(403, "你没有访问此功能的权限!"));
@@ -102,8 +105,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Comm
                 });
 
         // Security底层默认会拦截/logout请求,进行退出处理.
-        // 覆盖它默认的逻辑,才能执行我们自己的退出代码.
-        //把默认的/login覆盖为/securitylogout，但其实没有这个路径，filter就拦截不了。就会执行自己的/login
+        // 覆盖它默认的逻辑（即拦截/logout）,才能执行我们自己的退出代码.
+        //把默认的/login 改为 /securitylogout，但其实程序中没有这个路径，filter就拦截不了/logout。
+        // 就会执行自己的/logout，见LoginController里的方法logout()
         http.logout().logoutUrl("/securitylogout");
     }
 

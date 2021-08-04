@@ -59,7 +59,8 @@ public class MapperTests {
         user.setCreateTime(new Date());
 
         int rows = userMapper.insertUser(user);
-        System.out.println(rows);
+        System.out.println(rows); // 1
+        // 155 ——> 该数字是user表的最后id自增1，因为user-mapper.xml中的insertUser的实现中，告诉了id是自增主键，会一并封装入user对象中
         System.out.println(user.getId());
     }
 
@@ -77,12 +78,12 @@ public class MapperTests {
 
     @Test
     public void testSelectPosts() {
-        List<DiscussPost> list = discussPostMapper.selectDiscussPosts(149, 0, 10,0);
+        List<DiscussPost> list = discussPostMapper.selectDiscussPosts(152, 0, 10,0);
         for(DiscussPost post : list) {
             System.out.println(post);
         }
 
-        int rows = discussPostMapper.selectDiscussPostRows(149);
+        int rows = discussPostMapper.selectDiscussPostRows(152);
         System.out.println(rows);
     }
 
@@ -130,7 +131,7 @@ public class MapperTests {
         count = messageMapper.selectLetterCount("111_112");
         System.out.println(count);
 
-        // 查询未读私信的数量；  传个conversationId来干嘛？（也可传null）
+        // 查询未读私信的数量；  传个conversationId来干嘛——> 代表 131、111两user间的对话  （也可传null）
         count = messageMapper.selectLetterUnreadCount(131, "111_131");
         System.out.println(count);
 

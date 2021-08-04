@@ -30,7 +30,7 @@ public class SensitiveFilter {
     private TrieNode rootNode = new TrieNode();
 
     //初始化sensitive-words.txt
-    @PostConstruct  //此注解，表示在bean生成后，调用该方法
+    @PostConstruct  //此注解，表示在bean生成后(构造函数后调用)，调用该方法
     public void init() {
         try (
                 //从类路径加载字节流
@@ -52,6 +52,7 @@ public class SensitiveFilter {
         TrieNode tempNode = rootNode;
         for (int i = 0; i < keyword.length(); i++) {
             char c = keyword.charAt(i);
+//            TrieNode trieNode = tempNode.subNodes.get(c);
             TrieNode subNode = tempNode.getSubNode(c);
 
             if (subNode == null) {//没有子节点，自己去初始化
@@ -93,9 +94,9 @@ public class SensitiveFilter {
         while (position < text.length()) {
             char c = text.charAt(position);//这里，这个text的string，也被搞成char了
 
-            // 跳过符号，如   ★开★票★
-            if (isSymbol(c)) {
-                // 若指针1处于根节点,将此符号计入结果,让指针2向下走一步；这些☆等符号都是单字符？？
+            // 跳过  符号(非东亚文字范围的符号)，如   ★开★票★
+            if (isSymbol(c)) {  // 当前c是符号 就进入这个if
+                // 若指针1处于根节点,将此符号计入结果,让指针2向下走一步
                 if (tempNode == rootNode) {
                     sb.append(c);
                     begin++;

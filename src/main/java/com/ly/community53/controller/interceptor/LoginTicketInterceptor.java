@@ -39,18 +39,19 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
 
         if (ticket != null) {
             // 查询凭证
-            LoginTicket loginTicket = userService.findLoginTicket(ticket);
+            LoginTicket loginTicket = userService.findLoginTicket(ticket);  //直接从redis中取
             // 检查凭证是否有效
             if (loginTicket != null && loginTicket.getStatus() == 0 && loginTicket.getExpired().after(new Date())) {
                 // 根据凭证查询用户
-                User user = userService.findUserById(loginTicket.getUserId());
+                User user = userService.findUserById(loginTicket.getUserId());  // 这是从redis里面查找用户信息。
                 // 在本次请求中持有用户
                 hostHolder.setUser(user);
 
 
-                // 构建用户认证的结果,并存入SecurityContext,以便于Security进行授权.
-                //SecurityContextHolder与HostHolder差不多，SecurityContextHolder是存入的用户认证的结果；HostHolder存入的是用户
-                //// 存入认证结果  ————  principal: 主要信息; credentials: 证书（如密码或代替密码的信息）; authorities: 权限;
+                //  这一部分代码 ———— 干啥的？？SecurityContextHolder是存入的用户认证的结果，我觉得就是存入当前登录用户的权限
+                // 构建用户认证的结果(一个Token),并存入SecurityContext,以便于Security进行授权.
+                // SecurityContextHolder(我估计也是一个域对象)，SecurityContextHolder是存入的用户认证的结果；HostHolder存入的是用户
+                // 存入认证结果  ————  principal: 主要信息; credentials: 证书（如密码或代替密码的信息）; authorities: 权限;
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
                         user, user.getPassword(), userService.getAuthorities(user.getId()));
                 SecurityContextHolder.setContext(new SecurityContextImpl(authentication));
@@ -70,7 +71,7 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        hostHolder.clear();//在模板都渲染完成后，清理存入的user
-        SecurityContextHolder.clearContext();//清除SecurityContextHolder的内容
+        hostHolder.clear();//在模板都渲染完成后，清理存入的user；否则threadLocal 会有内存泄露的风险
+        SecurityContextHolder.clearContext();//清除SecurityContextHolder的内容(SecurityContextHolder是存入的用户认证的结果)
     }
 }

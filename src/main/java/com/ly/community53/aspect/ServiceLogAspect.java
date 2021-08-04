@@ -31,7 +31,7 @@ public class ServiceLogAspect {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
         if(attributes == null){   //这里消费者调用service，不做null检查的话就报错
-            return;//这里如果attributes == null，就不计日志了。  如要做日志 后续自己看看改吧
+            return; //这里如果attributes == null，就不计日志了。  如要做日志 后续自己看看改吧
         }
 
         HttpServletRequest request = attributes.getRequest();

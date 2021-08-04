@@ -46,6 +46,7 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    // 发帖
     @RequestMapping(path = "/add", method = RequestMethod.POST)
     @ResponseBody
     public String addDiscussPost(String title, String content) {
@@ -68,11 +69,11 @@ public class DiscussPostController implements CommunityConstant {
                 .setUserId(user.getId())
                 .setEntityType(ENTITY_TYPE_POST)
                 .setEntityId(post.getId());
-        eventProducer.fireEvent(event);//生产者发布事件
+        eventProducer.fireEvent(event);//生产者发布事件，这里记得去eventConsumer看看怎么消费发帖事件的，即把发布的帖子存入es
 
-        // 计算帖子分数
+        // 计算帖子分数  就是把postId存入 post:score 这个key里，用到set
         String redisKey = RedisKeyUtil.getPostScoreKey();
-        redisTemplate.opsForSet().add(redisKey, post.getId()); //set类型，自动去重
+        redisTemplate.opsForSet().add(redisKey, post.getId()); //set类型，自动去重；这是刚发帖，就加入对应post的id，以后会对其分数进行变化
 
         // todo 报错的情况,将来统一处理.
         return CommunityUtil.getJSONString(0, "发布成功!");//这里就发布成功了
@@ -109,7 +110,7 @@ public class DiscussPostController implements CommunityConstant {
 
         // 评论: 给帖子的评论
         // 回复: 给评论的评论
-        // 评论列表     ： 这里的id，是帖子的id————post.getId()
+        // 评论列表：这里的id，是帖子的id————post.getId()
         List<Comment> commentList = commentService.findCommentsByEntity(
                 ENTITY_TYPE_POST, post.getId(), page.getOffset(), page.getLimit());
 
@@ -128,25 +129,25 @@ public class DiscussPostController implements CommunityConstant {
                 // 点赞数量
                 likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_COMMENT, comment.getId());
                 commentVo.put("likeCount", likeCount);
-                // 点赞状态
+                // 点赞状态         // findEntityLikeStatus() 还是存在redis里面的————点赞状态
                 likeStatus = hostHolder.getUser() == null ? 0 :
                         likeService.findEntityLikeStatus(hostHolder.getUser().getId(), ENTITY_TYPE_COMMENT, comment.getId());
                 commentVo.put("likeStatus", likeStatus);
 
 
-                // 回复列表     :  这里的id，是评论的id————comment.getId()
+                // 回复列表     :  这里的id，是评论的id————comment.getId() ；ENTITY_TYPE_COMMENT == 2  代表是回复
                 List<Comment> replyList = commentService.findCommentsByEntity(
-                        ENTITY_TYPE_COMMENT, comment.getId(), 0, Integer.MAX_VALUE);
+                        ENTITY_TYPE_COMMENT, comment.getId(), 0, Integer.MAX_VALUE); // 回复没做分页
                 // 回复VO列表    回复的处理
                 List<Map<String, Object>> replyVoList = new ArrayList<>();
                 if (replyList != null) {
                     for (Comment reply : replyList) {
-                        Map<String, Object> replyVo = new HashMap<>();
+                        Map<String, Object> replyVo = new HashMap<>();  // 一条评论 有 多少回复，replyVoList就要存储多少个map
                         // 回复
                         replyVo.put("reply", reply);
                         // 作者
                         replyVo.put("user", userService.findUserById(reply.getUserId()));
-                        // 回复目标  target_id是0，即没有用户；
+                        // 回复目标user  target_id是0，即没有用户；
                         User target = reply.getTargetId() == 0 ? null : userService.findUserById(reply.getTargetId());
                         replyVo.put("target", target);
 
@@ -163,11 +164,11 @@ public class DiscussPostController implements CommunityConstant {
                 }
                 commentVo.put("replys", replyVoList);
 
-                // 回复数量
+                // 回复数量   ——> 这是 一条评论的 回复 的数量，要把它放在 commentVo 这个map里
                 int replyCount = commentService.findCommentCount(ENTITY_TYPE_COMMENT, comment.getId());
                 commentVo.put("replyCount", replyCount);
 
-                commentVoList.add(commentVo);
+                commentVoList.add(commentVo);  // 一条帖子有几条评论，就要放几个commentVo这种map；不过 评论是分页处理了的，每页最多5条
             }
         }
 
@@ -182,8 +183,9 @@ public class DiscussPostController implements CommunityConstant {
 
         // todo 这个应该拦截器检查是否登录的。。。。  不然直接输入url就能访问
         User user = hostHolder.getUser();
-        // 方法调用钱,SpringMVC会自动实例化Model和Page,并将Page注入Model.// 所以,在thymeleaf中可以直接访问Page对象中的数据.
-        // why？？page的current属性信息什么时候从页面封装入page对象的？自动封装？  page的current、limit有默认值
+        // 方法调用前,SpringMVC会自动实例化Model和Page,并将Page注入Model.// 所以,在thymeleaf中可以直接访问Page对象中的数据.
+        // why？？page的current属性信息什么时候从页面封装入page对象的？url请求时就会自动封装页面的page的属性进入bean
+        // page的current、limit有默认值
 
         if (user == null) {
             throw new RuntimeException("未登录!");//或是重定向，return "redirect:/login";
@@ -223,7 +225,7 @@ public class DiscussPostController implements CommunityConstant {
     public String setTop(int id) {
         discussPostService.updateType(id, 1);//0-普通帖；1-置顶帖子
 
-        // 触发发帖事件
+        // 触发发帖事件；发帖事件的消费者会将帖子存入es
         Event event = new Event()
                 .setTopic(TOPIC_PUBLISH)
                 .setUserId(hostHolder.getUser().getId())
@@ -235,7 +237,7 @@ public class DiscussPostController implements CommunityConstant {
         String redisKey = RedisKeyUtil.getPostScoreKey();
         redisTemplate.opsForSet().add(redisKey, id);
 
-        return CommunityUtil.getJSONString(0); //code为0，啥意思？
+        return CommunityUtil.getJSONString(0); //code为0，啥意思？异步请求传回的doce值为0，代表成功
     }
 
     // 加精
@@ -261,7 +263,7 @@ public class DiscussPostController implements CommunityConstant {
     public String setDelete(int id) {
         discussPostService.updateStatus(id, 2);
 
-        // 触发es的删帖事件
+        // 管理元删帖，触发es的删帖事件
         Event event = new Event()
                 .setTopic(TOPIC_DELETE)
                 .setUserId(hostHolder.getUser().getId())

@@ -8,7 +8,7 @@ function follow() {
 		// 关注TA
 		$.post(
 			CONTEXT_PATH + "/follow",
-			{"entityType":3,"entityId":$(btn).prev().val()},
+			{"entityType":3,"entityId":$(btn).prev().val()},   // $(btn).prev().val() ——> profile.html中${user.id}，即当前 主页用户的userId
 			function(data) {
 				data = $.parseJSON(data);
 				if(data.code == 0) {//是0，表示关注成功

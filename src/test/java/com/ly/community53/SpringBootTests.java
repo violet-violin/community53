@@ -49,7 +49,7 @@ public class SpringBootTests {
         System.out.println("after");
 
         // 删除测试数据
-        discussPostService.updateStatus(data.getId(), 2);//2——就是删除帖子
+        discussPostService.updateStatus(data.getId(), 2);//2——就是删除帖子，帖子状态为删除，再次查询时不会再select该帖子
     }
 
     @Test

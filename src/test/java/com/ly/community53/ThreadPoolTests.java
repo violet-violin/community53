@@ -38,6 +38,7 @@ public class ThreadPoolTests {
     private ThreadPoolTaskExecutor taskExecutor;
 
     // Spring可执行定时任务的线程池：无法直接注入，还要配置注入进来————ThreadPoolConfig
+    // 属性 仍是在 application.properties中配置
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
 
@@ -82,7 +83,7 @@ public class ThreadPoolTests {
             }
         };
 
-        //线程池执行方法：延迟10000ms，每隔1000ms执行
+        //线程池执行方法：延迟10000ms，每隔1000ms执行；定时任务
         scheduledExecutorService.scheduleAtFixedRate(task, 10000, 1000, TimeUnit.MILLISECONDS);
 
         sleep(30000);
@@ -125,13 +126,13 @@ public class ThreadPoolTests {
     @Test
     public void testThreadPoolTaskExecutorSimple() {
         for (int i = 0; i < 10; i++) {
-            alphaService.execute1(); //spring底层：会把alphaService的execute1方法，使用线程池来调用
+            alphaService.execute1(); //execute1()注解了@Async；spring底层：会把alphaService的execute1方法，使用线程池来调用
         }
 
-        sleep(10000);
+        sleep(10000);  // 主线程睡眠10s
     }
 
-    // 6.Spring定时任务线程池(简化)
+    // 6.Spring定时任务线程池(简化)  // 配合AlphaService#execute2()方法
     @Test
     public void testThreadPoolTaskSchedulerSimple() {
         sleep(30000);

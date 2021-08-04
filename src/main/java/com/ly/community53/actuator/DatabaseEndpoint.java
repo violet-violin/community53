@@ -13,7 +13,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 @Component
-@Endpoint(id = "database")  //给端点取个名字
+@Endpoint(id = "database")  //给端点取个名字  // 自定义端点database
 public class DatabaseEndpoint {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseEndpoint.class);

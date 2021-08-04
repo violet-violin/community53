@@ -11,6 +11,7 @@ import java.util.Date;
  * @author malaka
  * @create 2020-12-27 15:22
  */
+//索引，类似DB里的库；分片（一个索引拆分成多个分片来存储，提高并发能力）；副本[replica]（是对分片的备份，一个分片有多个副本）
 @Document(indexName = "discusspost", /*type = "_doc",*/ shards = 6, replicas = 3)
 public class DiscussPost {
 
@@ -18,7 +19,7 @@ public class DiscussPost {
     private int id;
 
     @Field(type = FieldType.Integer) //声明es存储的类型
-    private int userId;
+    private int userId;   // 帖子作者
 
     // 搜帖子，主要就是搜title、content
     // 互联网校招——title，尽可能的把该句拆分成多个词条：ik_max_word；存储就采用ik_max_word
@@ -26,14 +27,14 @@ public class DiscussPost {
     @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String title;
 
-    //其它有存储、搜索需求的字段，都这样注解
+    //其它有存储、搜索需求的字段，都这样注解；field注解看来是 es 的东西
     @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String content;
 
-    @Field(type = FieldType.Integer)
+    @Field(type = FieldType.Integer)  // COMMENT '0-普通; 1-置顶;',
     private int type;
 
-    @Field(type = FieldType.Integer)
+    @Field(type = FieldType.Integer)  // COMMENT '0-正常; 1-精华; 2-拉黑;',
     private int status;
 
     @Field(type = FieldType.Date)

@@ -23,7 +23,7 @@ public class MailTests {
     private MailClient mailClient;
 
     @Autowired
-    private TemplateEngine templateEngine;  //也是thymeleaf的模板引擎，用来发html的邮件
+    private TemplateEngine templateEngine;  //也是thymeleaf的模板引擎，用来操作要发送的模板html
 
     @Test
     public void testTextMail() {
@@ -35,10 +35,10 @@ public class MailTests {
         Context context = new Context();
         context.setVariable("username", "sunday");
 
-        String content = templateEngine.process("/mail/demo", context);
+        String content = templateEngine.process("/mail/demo", context); // 这里是 填充模板html内的数据
         System.out.println(content);
 
-        mailClient.sendMail("soresolitude@gmail.com", "HTML", content);
+        mailClient.sendMail("soresolitude@gmail.com", "HTML", content); // 发送邮件
     }
 
 }

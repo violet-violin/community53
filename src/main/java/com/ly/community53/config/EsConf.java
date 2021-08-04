@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.client.RestClients;
  * @author malaka
  * @create 2021-01-14 9:43
  */
-@Configuration
+@Configuration   // 使用配置类的方式来注入bean  ElasticsearchRestTemplate
 public class EsConf {
     @Value("${elasticSearch.url}")
     private String edUrl;

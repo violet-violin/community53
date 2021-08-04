@@ -39,13 +39,13 @@ public class ElasticsearchService {
     public void saveDiscussPost(DiscussPost post) {
         discussRepository.save(post);
     }
-
+    //    删除es中存储的帖子
     public void deleteDiscussPost(int id) {
         discussRepository.deleteById(id);
     }
 
 
-    //搜索
+    //搜索  高亮显示
     public Map<Long,List<DiscussPost>> searchDiscussPost(String keyword, int current, int limit) {//current—当前页；limit—每页显示多少数据
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(QueryBuilders.multiMatchQuery(keyword, "title", "content"))
@@ -90,7 +90,7 @@ public class ElasticsearchService {
 
 
 
-//这个方法有SearchResultMapper、ElasticsearchTemplate类过时了
+//这个方法有SearchResultMapper、ElasticsearchTemplate类   过时了
 //    public Page<DiscussPost> searchDiscussPost(String keyword, int current, int limit) {//current—当前页；limit—每页显示多少数据
 //        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
 //                .withQuery(QueryBuilders.multiMatchQuery(keyword, "title", "content"))

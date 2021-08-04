@@ -12,7 +12,7 @@ public class CommunityUtil {
 
     // 生成随机字符串
     public static String generateUUID() {
-        //.replaceAll()是替换所有“-”
+        //.replaceAll()是替换所有“-” 为 ""
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
@@ -26,7 +26,7 @@ public class CommunityUtil {
         return DigestUtils.md5DigestAsHex(key.getBytes());
     }
 
-    //code、msg、map放入json，并返回一个json字符串
+    //code、msg、map放入json，并返回一个json字符串；map用来存放想放的东西
     public static String getJSONString(int code, String msg, Map<String, Object> map) {
         JSONObject json = new JSONObject();
         json.put("code", code);
@@ -49,7 +49,7 @@ public class CommunityUtil {
         Map<String, Object> map = new HashMap<>();
         map.put("name", "zhangsan");
         map.put("age", 25);
-        System.out.println(getJSONString(0, "ok", map));
+        System.out.println(getJSONString(0, "ok", map)); // {"msg":"ok","code":0,"name":"zhangsan","age":25}
     }
 
 }

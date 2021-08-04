@@ -36,7 +36,7 @@
         </if>
     </select>
 
-<!--    不写keyProperty="id"的话，mybatis就不会把自动生成的id封装到实体DiscussPost的Id属性里，以后这个id属性会用到 ；把这个属性要存入es的-->
+<!--    不写keyProperty="id"的话，mybatis就不会把自动生成的id封装到实体DiscussPost的Id属性里，以后这个id属性会用到；把这个属性要存入es的-->
     <insert id="insertDiscussPost" parameterType="DiscussPost" keyProperty="id">
         insert into discuss_post(<include refid="insertFields"></include>)
         values(#{userId},#{title},#{content},#{type},#{status},#{createTime},#{commentCount},#{score})

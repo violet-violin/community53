@@ -2,6 +2,7 @@ package com.ly.community53.dao;
 
 import com.ly.community53.entity.Comment;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -9,12 +10,13 @@ import java.util.List;
  * @author malaka
  * @create 2021-01-05 16:12
  */
+@Repository
 @Mapper
 public interface CommentMapper {
 
     //查出所有的评论(对帖子的评论entityType=1、对评论的评论entityType=2)；
     //entityType=1 时，entityId为帖子id，entityType=2时，entityId为评论id
-    // 支持分页，就加了offset、limit
+    // 支持对评论的分页，就加了offset、limit
     List<Comment> selectCommentsByEntity(int entityType, int entityId, int offset, int limit);
 
     //查询帖子的评论总数

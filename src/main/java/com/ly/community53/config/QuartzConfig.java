@@ -17,13 +17,17 @@ public class QuartzConfig {
     // 1.通过FactoryBean封装Bean的实例化过程.
     // 2.将FactoryBean装配到Spring容器里.
     // 3.将FactoryBean注入给其他的Bean.
-    // 4.该其他的Bean会得到的是FactoryBean所管理的对象实例————即factory生成的对象实例。
+    // 4.其他的Bean会得到的是FactoryBean所管理的对象实例 —> 即factory生成的对象实例（如JobDetailFactoryBean管理的JobDetail对象实例）。
+    // 如注入一个JobDetailFactoryBean，你会得到JobDetail的bean。如下面一段代码
 
     // 配置JobDetail
-//     @Bean          QuartzConfig 这个类执行一次就行了，执行一次就注掉@Bean
+//     @Bean          QuartzConfig 这个类执行一次就行了，执行一次就注掉@Bean。
+//     配置好后，quartz就会读取配置信息，把读到的配置信息存储到DB表里；
+//     以后就读取表来执行任务，配置初始化到DB后，就不再用到。
+//     （这需要先进行properties里quartz的配置才会这样，不进行properties里的配置就只是读取内存里的jobDetail、Trigger来执行定时任务，就不能注掉）
     public JobDetailFactoryBean alphaJobDetail() {
         JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();
-        factoryBean.setJobClass(AlphaJob.class);//设置Jog实例
+        factoryBean.setJobClass(AlphaJob.class);//设置Job实例
         factoryBean.setName("alphaJob");//给Job的名字
         factoryBean.setGroup("alphaJobGroup");//组名
         factoryBean.setDurability(true);//任务长久保存
@@ -31,9 +35,9 @@ public class QuartzConfig {
         return factoryBean;
     }
 
-    // 配置Trigger(SimpleTriggerFactoryBean, CronTriggerFactoryBean(复杂trigger，有特殊表达式完成复杂逻辑，如每周二晚上10点做什么))
+    // 配置Trigger(SimpleTriggerFactoryBean [简单的trigger], CronTriggerFactoryBean[复杂trigger，有特殊表达式完成复杂逻辑，如每周二晚上10点做什么])
 //     @Bean   QuartzConfig 这个类执行一次就行了，执行一次就注掉@Bean
-    public SimpleTriggerFactoryBean alphaTrigger(JobDetail alphaJobDetail) { //alphaJobDetail和上面方法名对应，是factory生成实例的名字
+    public SimpleTriggerFactoryBean alphaTrigger(JobDetail alphaJobDetail) { //alphaJobDetail和上面方法名对应，是factoryBean所生成实例jobDetail的名字
         SimpleTriggerFactoryBean factoryBean = new SimpleTriggerFactoryBean();
         factoryBean.setJobDetail(alphaJobDetail);
         factoryBean.setName("alphaTrigger");//trigger的名字
@@ -44,7 +48,7 @@ public class QuartzConfig {
     }
 
 
-    // 刷新帖子分数任务
+    // 刷新帖子分数 定时任务
     @Bean
     public JobDetailFactoryBean postScoreRefreshJobDetail() {
         JobDetailFactoryBean factoryBean = new JobDetailFactoryBean();

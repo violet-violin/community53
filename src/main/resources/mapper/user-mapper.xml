@@ -38,7 +38,7 @@
     </select>
 
     <!--    增删改语句-->
-    <!--    parameterType：声明形参类型；  因为形参是Bean,而非简单类型，故要声明；
+    <!--    parameterType：声明形参类型；因为形参是Bean,而非简单类型，故要声明；
         keyProperty：告诉mysql自增的id对应的是User类的“id”属性
         #{username}：引用“User”的属性来插入-->
     <insert id="insertUser" parameterType="User" keyProperty="id">
@@ -47,14 +47,18 @@
         #{createTime})
     </insert>
 
+    <!--    增删改语句：#{status}、#{id}直接从形参里面取值
+status标记用户是否已激活  0-未激活；1-已激活；  从0升到1-->
     <update id="updateStatus">
         update user set status = #{status} where id = #{id}
     </update>
 
+    <!--传入一个用户id，来改头像-->
     <update id="updateHeader">
         update user set header_url = #{headerUrl} where id = #{id}
     </update>
 
+    <!--传入一个用户id，改用户密码-->
     <update id="updatePassword">
         update user set password = #{password} where id = #{id}
     </update>

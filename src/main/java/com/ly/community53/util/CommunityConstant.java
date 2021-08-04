@@ -73,7 +73,7 @@ public interface CommunityConstant {//这是接口，让类实现即可用常量
     String TOPIC_SHARE = "share";
 
     /**
-     * 系统用户ID，message表 —— 系统消息的from_id就是1
+     * 系统用户ID，message表 —— 系统私信消息的from_id就是1
      */
     int SYSTEM_USER_ID = 1;
 

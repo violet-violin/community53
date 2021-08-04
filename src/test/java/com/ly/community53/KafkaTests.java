@@ -21,6 +21,7 @@ public class KafkaTests {
 
     @Test
     public void testKafka() {
+        // 生产者往消息系统发送消息
         kafkaProducer.sendMessage("test", "你好、、、、、、、、、、、、、、、、、、、、、、、、、、、、、");
         kafkaProducer.sendMessage("test", "在吗、、、、、、、、、、、、、、、、、、、、");
         kafkaProducer.sendMessage("test", "is there？？？？？？？？？？？？？？？？？？？？？");
@@ -49,7 +50,7 @@ class KafkaProducer {//生产者，生产消息时主动的
 @Component  //用容器来管理
 class KafkaConsumer {//消费者，消费消息是被动的
 
-    @KafkaListener(topics = {"test"})  //test主题
+    @KafkaListener(topics = {"test"})  //监听test主题
     public void handleMessage(ConsumerRecord record) {//把消息封装为ConsumerRecord
         System.out.println(record.value());//打印，读出record封装的消息
     }

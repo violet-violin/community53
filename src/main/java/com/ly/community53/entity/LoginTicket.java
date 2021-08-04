@@ -11,8 +11,8 @@ public class LoginTicket {//对应login_ticket表    后续用redis存储
 
     private int id;
     private int userId;
-    private String ticket;
-    private int status;
+    private String ticket;  // 真正的登录凭证
+    private int status;  // COMMENT '0-有效; 1-无效;',
     private Date expired;
 
     public int getId() {

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
+	<link rel="icon" th:href="@{/img/53icon.ico}"/>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
 	<title>53论坛-个人主页</title>
@@ -82,6 +82,7 @@
 					<ul class="list-unstyled mt-4 pl-3 pr-3">
 						<li class="border-bottom pb-3 mt-4" th:each="map:${myComments}">
 							<div class="font-size-16 text-info">
+<!--								<a th:href="@{|/discuss/detail/${map.discussPostById.id}|}" class="text-info" th:utext="${map.discussPostById.title}">备战春招，面试刷题跟他复习，一个月全搞定！</a>-->
 								<a th:href="@{|/discuss/detail/${map.discussPostById.id}|}" class="text-info" th:utext="${map.discussPostById.title}">备战春招，面试刷题跟他复习，一个月全搞定！</a>
 							</div>
 							<div class="mt-1 font-size-14" th:text="${map.comment.content}">
@@ -111,7 +112,7 @@
 		</div>
 
 		<!-- 尾部 -->
-		<footer class="bg-dark">
+		<footer class="bg-dark" th:replace="index::footer">
 			<div class="container">
 				<div class="row">
 					<!-- 二维码 -->

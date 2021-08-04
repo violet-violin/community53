@@ -4,11 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!--访问该页面时,在此处生成CSRF令牌.-->
+    <!--访问该页面时,security在此处生成CSRF令牌.-->
 <!--    <meta name="_csrf" th:content="${_csrf.token}">-->
 <!--    <meta name="_csrf_header" th:content="${_csrf.headerName}">-->
 
-    <link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
+<!--    <link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>-->
+    <link rel="icon" th:href="@{/img/53icon.ico}" sizes="16x16"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           crossorigin="anonymous">
     <link rel="stylesheet" th:href="@{/css/global.css}"/>  <!-- th:href="@{/css/global.css}：css、js等静态资源都这么处理	-->
@@ -34,7 +35,7 @@
                         <li class="nav-item ml-3 btn-group-vertical">
                             <a class="nav-link" th:href="@{/index}">首页</a>
                         </li>
-                        <!--							// loginUser是在拦截器里存入的，里面存到当前登录的user，在Controller之后、模板渲染前执行-->
+                        <!--// loginUser是在LoginTicketInterceptor#postHandle()方法里存入的，里面存的当前登录user，在Controller之后、模板渲染前执行-->
                         <li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser!=null}">
                             <a class="nav-link position-relative" th:href="@{/letter/list}">消息<span
                                     class="badge badge-danger"
@@ -184,7 +185,7 @@
     </div>
 
     <!-- 尾部 -->
-    <footer class="bg-dark">
+    <footer class="bg-dark" th:fragment="footer">
         <div class="container">
             <div class="row">
                 <!-- 二维码 -->
@@ -225,19 +226,19 @@
                         <div class="col">
                             <ul class="nav btn-group-vertical company-info">
                                 <li class="nav-item text-white-50">
-                                    公司地址：北京市朝阳区大屯路东金泉时代3-2708北京牛客科技有限公司
+                                    公司地址：重庆市沙坪坝区沙正街176号重庆53科技有限公司
                                 </li>
                                 <li class="nav-item text-white-50">
-                                    联系方式：010-60728802(电话)&nbsp;&nbsp;&nbsp;&nbsp;admin@nowcoder.com
+                                    联系方式：010-60728802(电话)&nbsp;&nbsp;&nbsp;&nbsp;admin@community53.com
                                 </li>
                                 <li class="nav-item text-white-50">
-                                    牛客科技©2018 All rights reserved
+                                    community53©2018 All rights reserved
                                 </li>
                                 <li class="nav-item text-white-50">
-                                    京ICP备14055008号-4 &nbsp;&nbsp;&nbsp;&nbsp;
+                                    渝ICP备10202274-4号 &nbsp;&nbsp;&nbsp;&nbsp;
                                     <img src="http://static.nowcoder.com/company/images/res/ghs.png"
                                          style="width:18px;"/>
-                                    京公网安备 11010502036488号
+                                    渝公网安备 11010502036453号
                                 </li>
                             </ul>
                         </div>

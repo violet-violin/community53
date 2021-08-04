@@ -66,9 +66,9 @@ public class RedisTests {
 
         redisTemplate.opsForSet().add(redisKey, "刘备", "关羽", "张飞", "赵云", "诸葛亮");
 
-        System.out.println(redisTemplate.opsForSet().size(redisKey));
-        System.out.println(redisTemplate.opsForSet().pop(redisKey));//随机弹出一个
-        System.out.println(redisTemplate.opsForSet().members(redisKey));
+        System.out.println(redisTemplate.opsForSet().size(redisKey)); // 5
+        System.out.println(redisTemplate.opsForSet().pop(redisKey));//随机弹出一个 张飞
+        System.out.println(redisTemplate.opsForSet().members(redisKey)); // 返回一个Set<V>  [关羽, 刘备, 赵云, 诸葛亮]
     }
 
     @Test
@@ -81,10 +81,11 @@ public class RedisTests {
         redisTemplate.opsForZSet().add(redisKey, "沙僧", 70);
         redisTemplate.opsForZSet().add(redisKey, "白龙马", 60);
 
-        System.out.println(redisTemplate.opsForZSet().zCard(redisKey));//个数
-        System.out.println(redisTemplate.opsForZSet().score(redisKey, "八戒"));
-        System.out.println(redisTemplate.opsForZSet().reverseRank(redisKey, "八戒"));//由大到小取排名
-        System.out.println(redisTemplate.opsForZSet().reverseRange(redisKey, 0, 2));//由大到小的范围取值前三名
+        System.out.println(redisTemplate.opsForZSet().zCard(redisKey));//个数  5
+        System.out.println(redisTemplate.opsForZSet().score(redisKey, "八戒"));  // 50.0
+        System.out.println(redisTemplate.opsForZSet().reverseRank(redisKey, "八戒"));//由大到小取排名：4
+        System.out.println(redisTemplate.opsForZSet().reverseRank(redisKey, "悟空"));//由大到小取排名：0
+        System.out.println(redisTemplate.opsForZSet().reverseRange(redisKey, 0, 2));//由大到小的范围取值前三名：[悟空, 唐僧, 沙僧]
     }
 
     //常用命令
@@ -92,12 +93,13 @@ public class RedisTests {
     public void testKeys() {
         redisTemplate.delete("test:user");
 
-        System.out.println(redisTemplate.hasKey("test:user"));
+        System.out.println(redisTemplate.hasKey("test:user")); // false
 
+        // Set time to live for given {@code key}.
         redisTemplate.expire("test:students", 10, TimeUnit.SECONDS);
     }
 
-    // 多次访问一个key，批量发送命令,节约网络开销.
+    // 多次访问一个key，批量发送命令,节约网络开销。  批量发送命令就是用 boundValueOps()方法来绑定。
     @Test
     public void testBoundOperations() {
         String redisKey = "test:count";
@@ -107,7 +109,7 @@ public class RedisTests {
         operations.increment();
         operations.increment();
         operations.increment();
-        System.out.println(operations.get());
+        System.out.println(operations.get());  // 5
     }
 
     // 编程式事务：redis的事务管理较简单；redis中声明式事务用的少，不演示了。
@@ -150,7 +152,7 @@ public class RedisTests {
         }//存储[1,100000]的随机数
 
         long size = redisTemplate.opsForHyperLogLog().size(redisKey);
-        System.out.println(size);//99553；标准值为100000，标准误差为0.81%；
+        System.out.println(size);//99553 (统计的是两次添加后redisKey里该有的数据的量)；标准值为100000，但统计有误差，标准误差为0.81%；
     }
 
     // 将3组数据合并, 再统计合并后的重复数据的独立总数.
@@ -175,7 +177,7 @@ public class RedisTests {
         redisTemplate.opsForHyperLogLog().union(unionKey, redisKey2, redisKey3, redisKey4);
 
         long size = redisTemplate.opsForHyperLogLog().size(unionKey);
-        System.out.println(size);//19833；标准值20000，标准误差为0.81%；   基数算法？？原理？？
+        System.out.println(size);//19833；标准值20000，标准误差为0.81%；统计的是unionKey该有的数据的量   基数算法？？原理？？
     }
 
     // 统计一组数据的布尔值
@@ -233,9 +235,9 @@ public class RedisTests {
             }
         });
 
-        System.out.println(obj);//7
+        System.out.println(obj);//7   0--6
 
-        //全是true
+        // 0-6 全是true
         System.out.println(redisTemplate.opsForValue().getBit(redisKey, 0));
         System.out.println(redisTemplate.opsForValue().getBit(redisKey, 1));
         System.out.println(redisTemplate.opsForValue().getBit(redisKey, 2));
@@ -243,6 +245,7 @@ public class RedisTests {
         System.out.println(redisTemplate.opsForValue().getBit(redisKey, 4));
         System.out.println(redisTemplate.opsForValue().getBit(redisKey, 5));
         System.out.println(redisTemplate.opsForValue().getBit(redisKey, 6));
+        System.out.println(redisTemplate.opsForValue().getBit(redisKey, 7));  // false
 //        System.out.println(redisTemplate.opsForValue().getBit(redisKey, 9));
 //        System.out.println(redisTemplate.opsForValue().getBit(redisKey, 10));
     }

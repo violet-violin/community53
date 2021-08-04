@@ -19,7 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PostScoreRefreshJob implements Job, CommunityConstant { //定时任务
+public class PostScoreRefreshJob implements Job, CommunityConstant { //定时任务，继承Job
 
     private static final Logger logger = LoggerFactory.getLogger(PostScoreRefreshJob.class);
 
@@ -47,9 +47,10 @@ public class PostScoreRefreshJob implements Job, CommunityConstant { //定时任
     }
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-        String redisKey = RedisKeyUtil.getPostScoreKey();
-        BoundSetOperations operations = redisTemplate.boundSetOps(redisKey);
+    public void execute(JobExecutionContext context) throws JobExecutionException {  // 定时任务执行，重写了Job接口里的方法
+        String redisKey = RedisKeyUtil.getPostScoreKey();      // redis内存储帖子分数的键
+        // BoundSetOperations就是一个绑定key的对象，我们可以通过这个对象来进行与key相关的操作。如add、pop等等
+        BoundSetOperations operations = redisTemplate.boundSetOps(redisKey);  // 该redisKey里面存储的是postId
 
         if (operations.size() == 0) { //没有点赞、评论这些影响帖子因素的存在，没存入redis
             logger.info("[任务取消] 没有需要刷新的帖子!");
@@ -58,13 +59,13 @@ public class PostScoreRefreshJob implements Job, CommunityConstant { //定时任
 
         logger.info("[任务开始] 正在刷新帖子分数: " + operations.size());
         while (operations.size() > 0) {
-            this.refresh((Integer) operations.pop());
+            this.refresh((Integer) operations.pop());  //refresh()  刷新一个帖子 的分数；pop() 弹出集合中的值
         }
         logger.info("[任务结束] 帖子分数刷新完毕!");
     }
 
 
-    //刷新一个帖子
+    //刷新一个帖子 的分数 ———— 会更改 MySQL、ES里面的内容
     private void refresh(int postId) {
         DiscussPost post = discussPostService.findDiscussPostById(postId);
 
@@ -82,10 +83,10 @@ public class PostScoreRefreshJob implements Job, CommunityConstant { //定时任
 
         // 计算权重（精华分是75）
         double w = (wonderful ? 75 : 0) + commentCount * 10 + likeCount * 2;
-        // 分数 = 帖子权重 + 距离天数
+        // 分数 = 帖子权重 + 距离天数   score计算公式：log（精华分 + 评论数*10 + 点赞数*2 + 收藏数*2）+（发布时间-牛客纪元）
         double score = Math.log10(Math.max(w, 1))
                 + (post.getCreateTime().getTime() - epoch.getTime()) / (1000 * 3600 * 24);
-        // 更新帖子分数
+        // 更新帖子分数   数据库里discussPost 的变更
         discussPostService.updateScore(postId, score);
 
         // 同步搜索数据：这也变成定时任务了

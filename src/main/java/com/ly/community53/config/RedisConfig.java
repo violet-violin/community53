@@ -9,6 +9,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 @Configuration
 public class RedisConfig {
 
+    // 把一个RedisTemplate 的bean给容器管理起来，该RedisTemplate设置了String/Hash的key为string，value为json格式
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();

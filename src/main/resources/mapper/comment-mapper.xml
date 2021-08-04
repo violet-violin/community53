@@ -29,6 +29,7 @@
         and entity_id = #{entityId}
     </select>
 
+<!--    不写keyProperty="id"的话，mybatis就不会把自动生成的id封装到实体Comment的Id属性里；难道评论的id不会再用到，就不封装入了？-->
     <insert id="insertComment" parameterType="Comment">
         insert into comment(<include refid="insertFields"></include>)
         values(#{userId},#{entityType},#{entityId},#{targetId},#{content},#{status},#{createTime})

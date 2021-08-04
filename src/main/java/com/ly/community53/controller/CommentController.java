@@ -54,25 +54,25 @@ public class CommentController implements CommunityConstant {
 
         commentService.addComment(comment);
 
-        // 添加评论后，就触发评论事件了
+        // 添加评论后，就触发评论事件了；系统会给被评论的实体的作者发送私信
         Event event = new Event()
                 .setTopic(TOPIC_COMMENT)
                 .setUserId(hostHolder.getUser().getId())
-                .setEntityType(comment.getEntityType())
+                .setEntityType(comment.getEntityType()) //entityType代表实体类型（帖子、评论）int ENTITY_TYPE_POST = 1; ENTITY_TYPE_COMMENT = 2;
                 .setEntityId(comment.getEntityId())
                 .setData("postId", discussPostId);
 
-        if (comment.getEntityType() == ENTITY_TYPE_POST) {//评论的是帖子
+        if (comment.getEntityType() == ENTITY_TYPE_POST) {//评论的是帖子，comment.getEntityId()就得到帖子id
             DiscussPost target = discussPostService.findDiscussPostById(comment.getEntityId());
             event.setEntityUserId(target.getUserId());//target.getUserId() ———— 帖子作者id
         } else if (comment.getEntityType() == ENTITY_TYPE_COMMENT) {//评论的是评论，即是回复。
             Comment target = commentService.findCommentById(comment.getEntityId());//comment.getEntityId()是评论的id
-            event.setEntityUserId(target.getUserId());//target.getUserId()发布评论的作者id
+            event.setEntityUserId(target.getUserId());//target.getUserId()  发布评论的作者id
         }
-        //生产者处理事件，消费者一有内容就会自动触发；然后就会发生系统通知（该功能后续马上实现）
+        //生产者处理事件(生产者往消息队列发送消息)，   //消费者一有内容就会自动触发；然后就会发生系统通知（该功能后续马上实现）
         eventProducer.fireEvent(event);
 
-        //一旦帖子有了评论，discuss_post表的comment_count字段就会加1，相应的触发评论事件，更新es。
+        //一旦帖子有了评论，discuss_post表的comment_count字段就会加1，相应的触发发帖事件，更新es。
         if(comment.getEntityType() == ENTITY_TYPE_POST){//评论的是帖子
             // 触发发帖事件
             event = new Event()
@@ -81,13 +81,15 @@ public class CommentController implements CommunityConstant {
                     .setEntityType(ENTITY_TYPE_POST)
                     .setEntityId(discussPostId);
             eventProducer.fireEvent(event);//生产者发布事件
+            // 方法里两个event的区别？ 前者是评论事件，后者是发帖事件
+            //为什么评论帖子会触发发帖事件 因为一旦帖子有了评论，discuss_post表的comment_count字段就会加1，相应的触发评论事件，更新es中的帖子
 
-            // 计算帖子分数
+            // 计算帖子分数：这个计算帖子分数，没看懂? 后期再补补  就是把postId存入 post:score 这个key里，用到set
             String redisKey = RedisKeyUtil.getPostScoreKey();
             redisTemplate.opsForSet().add(redisKey, discussPostId); //set类型，自动去重
         }
 
-        return "redirect:/discuss/detail/" + discussPostId;
+        return "redirect:/discuss/detail/" + discussPostId; // 处理完 comment的添加后，就重定向到 帖子详情页
     }
 
     @RequestMapping(path = "/myComments", method = RequestMethod.GET)
@@ -120,7 +122,7 @@ public class CommentController implements CommunityConstant {
                 map.put("comment", comment);
                 if(comment.getEntityType() == ENTITY_TYPE_POST){
                     entityId = comment.getEntityId();
-                }else if(comment.getEntityType() == ENTITY_TYPE_COMMENT){
+                }else if(comment.getEntityType() == ENTITY_TYPE_COMMENT){ // 评论的 评论(即这是条回复)，comment.getEntityId()就是回复的评论的id,再根据评论id找出帖子id
                     entityId =   commentService.findEntityIdById(comment.getEntityId());
                 }
 

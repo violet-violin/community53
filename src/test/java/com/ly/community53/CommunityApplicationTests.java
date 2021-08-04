@@ -55,7 +55,7 @@ class CommunityApplicationTests implements ApplicationContextAware {
     }
 
     @Autowired
-    @Qualifier("alphaHibernate")//没有此注解时，注入的是@Primary
+    @Qualifier("alphaHibernate") //没有此注解时，注入的是@Primary
     private AlphaDao alphaDao;
 
     @Autowired

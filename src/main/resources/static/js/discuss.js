@@ -4,6 +4,7 @@ $(function(){
     $("#deleteBtn").click(setDelete);
 });
 
+// 点赞
 function like(btn, entityType, entityId, entityUserId,postId) {
     //向服务器提交异步请求
     $.post(
@@ -28,7 +29,7 @@ function setTop() {
         {"id":$("#postId").val()},
         function(data) {
             data = $.parseJSON(data);
-            if(data.code == 0) {
+            if(data.code == 0) { // 异步请求传回的doce值为0，代表成功
                 $("#topBtn").attr("disabled", "disabled");//代表已经置顶成功了，再把置顶按钮"disabled"属性设置为不可用——"disabled"
             } else {
                 alert(data.msg);

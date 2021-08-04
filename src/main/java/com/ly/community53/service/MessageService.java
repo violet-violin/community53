@@ -46,9 +46,9 @@ public class MessageService {
         message.setContent(sensitiveFilter.filter(message.getContent()));//过滤敏感词
         return messageMapper.insertMessage(message);
     }
-    //阅读消息，改变消息状态即可
+    //阅读消息(设置消息状态为已读即可)，改变消息状态即可  // ids 是个什么东西？通知页上传来的的他5条系统通知
     public int readMessage(List<Integer> ids) {
-        return messageMapper.updateStatus(ids, 1);
+        return messageMapper.updateStatus(ids, 1);  // 私信状态由0改1
     }
 
 

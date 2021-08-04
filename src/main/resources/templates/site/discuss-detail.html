@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
+	<link rel="icon" th:href="@{/img/53icon.ico}"/>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
 	<link rel="stylesheet" th:href="@{/css/discuss-detail.css}" />
@@ -124,7 +124,7 @@
 				<ul class="list-unstyled mt-4">
 					<!-- 第1条回帖XX  每条回帖 -->
 					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="cvo:${comments}">
-<!--						<a th:href="@{|/user/profile/${cvo.user.id}|}>    为什么我的跳转链接弄成这样就点不进去帖子详情页？？？少了个“  woc-->
+<!--						<a th:href="@{|/user/profile/${cvo.user.id}|}> 为什么我的跳转链接弄成这样就点不进去帖子详情页？少了个 " woc这个。.。怎么改，woc woc-->
 						<a th:href="@{|/user/profile/${cvo.user.id}|}">
 							<img th:src="${cvo.user.headerUrl}" class="align-self-start mr-4 rounded-circle user-header" alt="用户头像" >
 						</a>
@@ -240,7 +240,7 @@
 		</div>
 
 		<!-- 尾部 -->
-		<footer class="bg-dark">
+		<footer class="bg-dark" th:replace="index::footer">
 			<div class="container">
 				<div class="row">
 					<!-- 二维码 -->

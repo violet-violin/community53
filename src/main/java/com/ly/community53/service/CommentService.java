@@ -49,9 +49,9 @@ public class CommentService implements CommunityConstant {
 
         // 更新帖子的评论数量
         if (comment.getEntityType() == ENTITY_TYPE_POST) {//只有更新帖子时，才更新discuss_post表的comment_count字段
-            //先查到帖子的评论数量，这里这个数量已经数据库自动加1了
+            //先查到帖子的评论数量，这里这个数量已经数据库自动加1了 ——> 因为它是从comment DB里查的，刚插入了一条comment进入
             int count = commentMapper.selectCountByEntity(comment.getEntityType(), comment.getEntityId());//查到帖子的评论数量
-            discussPostService.updateCommentCount(comment.getEntityId(), count);
+            discussPostService.updateCommentCount(comment.getEntityId(), count); //这里是更新discussPost DB的commentCount列
         }
 
         return rows;

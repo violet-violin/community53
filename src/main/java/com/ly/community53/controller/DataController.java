@@ -16,7 +16,7 @@ public class DataController {
     @Autowired
     private DataService dataService;
 
-    // 来到统计页面 ；  GET、POST都可以？？可能有两个地方能来到这个/data路径（其一是直接来到这个页面；
+    // 来到统计页面 ；  GET、POST都可以？？可能有两个地方能来到这个/data路径（其一是通过url直接来到这个页面；
     // 其二是下面两个方法的请求转发，处理下面两方法的后续逻辑————来到data页面）
     @RequestMapping(path = "/data", method = {RequestMethod.GET, RequestMethod.POST})
     public String getDataPage() {

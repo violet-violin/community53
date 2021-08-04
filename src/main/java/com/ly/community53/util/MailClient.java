@@ -26,6 +26,7 @@ public class MailClient {
     @Value("${spring.mail.username}")
     private String from;
 
+    // 形参：分别是 目标发送邮箱、主题、邮件内容
     public void sendMail(String to, String subject, String content) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

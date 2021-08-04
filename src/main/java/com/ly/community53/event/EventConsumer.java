@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.concurrent.Future;
 
 @Component
-public class EventConsumer implements CommunityConstant {//消费者被动触发
+public class EventConsumer implements CommunityConstant {  //消费者消费消息 是被动触发的
 
     private static final Logger logger = LoggerFactory.getLogger(EventConsumer.class);
 
@@ -62,7 +62,7 @@ public class EventConsumer implements CommunityConstant {//消费者被动触发
 
 
     //消费评论、点赞、关注事件
-    @KafkaListener(topics = {TOPIC_COMMENT, TOPIC_LIKE, TOPIC_FOLLOW}) //三个主题？？ 三个主题都要消费
+    @KafkaListener(topics = {TOPIC_COMMENT, TOPIC_LIKE, TOPIC_FOLLOW}) //三个主题都要关注，三个主题都要消费
     public void handleCommentMessage(ConsumerRecord record) {
         if (record == null || record.value() == null) {
             logger.error("消息的内容为空!");
@@ -77,7 +77,7 @@ public class EventConsumer implements CommunityConstant {//消费者被动触发
 
         // 发送站内通知，发站内信
         //message字段：id、from_id、to_id、conversation_id content、status、create_time
-        Message message = new Message();
+        Message message = new Message(); // new 一条私信出来，系统发送给用户通知有人 评论、点赞、关注
         message.setFromId(SYSTEM_USER_ID);
         message.setToId(event.getEntityUserId());
         message.setConversationId(event.getTopic());//系统通知，就comment、like、follow三个
@@ -98,10 +98,10 @@ public class EventConsumer implements CommunityConstant {//消费者被动触发
         }
 
         message.setContent(JSONObject.toJSONString(content));
-        messageService.addMessage(message);
+        messageService.addMessage(message); // 发送私信
     }
 
-    // 消费发帖事件；把发布的帖子存入es
+    // 消费发帖事件；把发布的帖子存入es   // 不仅是发帖，帖子追加评论会影响discussPost的commentCount字段，追加评论也会触发 消费发帖事件
     @KafkaListener(topics = {TOPIC_PUBLISH})
     public void handlePublishMessage(ConsumerRecord record) {
         if (record == null || record.value() == null) {

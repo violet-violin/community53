@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 //import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 //import org.springframework.data.elasticsearch.core.SearchResultMapper;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.SearchHit;
 //import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
@@ -45,8 +46,10 @@ public class ElasticsearchTests {
     @Autowired
     private DiscussPostRepository discussRepository;
 
-    //    @Autowired//有些情况DiscussPostRepository处理不了，就用ElasticsearchTemplate
-//    private ElasticsearchTemplate elasticTemplate;   //始终无法注入？？
+    //    @Autowired//有些情况DiscussPostRepository处理不了，就用ElasticsearchTemplate (该类已被标注@Deprecated)
+//始终无法注入 因为ElasticsearchTemplate的配置已经过期失效了，所以注入不进去；
+// 但是可以使用配置类注入ElasticsearchRestTemplate，见config/EsConf.java
+//    private ElasticsearchTemplate elasticTemplate;
     @Autowired
     private ElasticsearchRestTemplate elasticsearchRestTemplate;  // 注意不要注入ElasticsearchTemplate
 
@@ -72,7 +75,6 @@ public class ElasticsearchTests {
         discussRepository.saveAll(discussMapper.selectDiscussPosts(132, 0, 100,0));
         discussRepository.saveAll(discussMapper.selectDiscussPosts(133, 0, 100,0));
         discussRepository.saveAll(discussMapper.selectDiscussPosts(134, 0, 100,0));
-
     }
 
     @Test
@@ -92,7 +94,7 @@ public class ElasticsearchTests {
     public void testSearchByRepository() {
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()//视频里是SearchQuery来接收的
                 .withQuery(QueryBuilders.multiMatchQuery("互联网寒冬", "title", "content"))
-                .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
+                .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))   // type  COMMENT '0-普通; 1-置顶;',
                 .withSort(SortBuilders.fieldSort("score").order(SortOrder.DESC))  //按分数降序来排序
                 .withSort(SortBuilders.fieldSort("createTime").order(SortOrder.DESC))//按照type、score、createTime三个条件来排，先看type，再依次
                 .withPageable(PageRequest.of(0, 10))//第0页开始显示，每页显示10条数据

@@ -24,7 +24,7 @@ public class KaptchaConfig {
         properties.setProperty("kaptcha.textproducer.font.color", "0,0,0");//"0,0,0"  or "black"
         properties.setProperty("kaptcha.textproducer.char.string", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYAZ");//图片里的随机字符
         properties.setProperty("kaptcha.textproducer.char.length", "4");//随机字符个数
-        properties.setProperty("kaptcha.noise.impl", "com.google.code.kaptcha.impl.NoNoise");//干扰类；其实默认就有点干扰
+        properties.setProperty("kaptcha.noise.impl", "com.google.code.kaptcha.impl.NoNoise");//干扰类，让图片变模糊点；其实默认就有点干扰
 
         DefaultKaptcha kaptcha = new DefaultKaptcha();
         Config config = new Config(properties);

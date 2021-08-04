@@ -70,7 +70,7 @@ public class UserController implements CommunityConstant {
     @Value("${quniu.bucket.header.url}")
     private String headerBucketUrl;
 
-    @LoginRequired
+    @LoginRequired  // 表示该方法需要登录才能访问
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
     public String getSettingPage(Model model) {
         // 上传文件名称：弄成随机的
@@ -114,7 +114,7 @@ public class UserController implements CommunityConstant {
         }
 
         String fileName = headerImage.getOriginalFilename();
-        String suffix = fileName.substring(fileName.lastIndexOf("."));//图片文件名后缀
+        String suffix = fileName.substring(fileName.lastIndexOf("."));//得到图片文件名后缀，即 fileName . 后面的内容
         if (StringUtils.isBlank(suffix)) {
             model.addAttribute("error", "文件的格式不正确!");
             return "/site/setting";
@@ -123,7 +123,7 @@ public class UserController implements CommunityConstant {
         // 生成随机文件名
         fileName = CommunityUtil.generateUUID() + suffix;
         // 确定文件存放的路径
-        File dest = new File(uploadPath + "/" + fileName);//这个dest用来上传到服务器的dest位置
+        File dest = new File(uploadPath + "/" + fileName);//这个dest的File对象 用来上传到服务器的dest位置
         try {
             // 存储文件
             headerImage.transferTo(dest);
@@ -153,7 +153,7 @@ public class UserController implements CommunityConstant {
         response.setContentType("image/" + suffix);
         try (//图片是二进制数据，用到字节流
                 FileInputStream fis = new FileInputStream(fileName);
-                OutputStream os = response.getOutputStream();
+                OutputStream os = response.getOutputStream();           // try （） 括号中的流会自动关闭
         ) {
             byte[] buffer = new byte[1024];
             int b = 0;
@@ -208,6 +208,7 @@ public class UserController implements CommunityConstant {
     @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
     public String getProfilePage(@PathVariable("userId") int userId, Model model) {
         User user = userService.findUserById(userId);
+//  User user1 = hostHolder.getUser();  为什么不能用它 取出user 这是取出当前登录的user findUserById是靠id取出user，没登录也能到别人主页
         if (user == null) {
             throw new RuntimeException("该用户不存在!");
         }

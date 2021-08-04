@@ -23,7 +23,7 @@ public class DataService {
 
     private SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 
-    // 将指定的IP计入UV：一有人访问网站，就使用拦截器计入；不精确的统计算法，标准误差为0.81%。
+    // 将指定的IP计入UV：一有人访问网站，就使用拦截器计入登入ip地址；不精确的统计算法，标准误差为0.81%。
     public void recordUV(String ip) {//该方法在DataInterceptor里使用，将指定的IP计入UV
         String redisKey = RedisKeyUtil.getUVKey(df.format(new Date()));
         redisTemplate.opsForHyperLogLog().add(redisKey, ip);
@@ -53,7 +53,7 @@ public class DataService {
         return redisTemplate.opsForHyperLogLog().size(redisKey);
     }
 
-    // 将指定用户计入DAU；性能好、且可以统计精确
+    // 将指定用户计入DAU(一有人访问网站，就使用拦截器计入userId)；性能好、且可以统计精确
     public void recordDAU(int userId) {//该方法在DataInterceptor里使用，将指定用户计入DAU
         String redisKey = RedisKeyUtil.getDAUKey(df.format(new Date()));
         redisTemplate.opsForValue().setBit(redisKey, userId, true);
@@ -86,5 +86,4 @@ public class DataService {
             }
         });
     }
-
 }

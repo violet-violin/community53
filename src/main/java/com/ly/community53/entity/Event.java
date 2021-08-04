@@ -11,10 +11,13 @@ public class Event {
 
     private String topic;//主题，就是事件的类型
     private int userId;//这个事件的触发人
-    private int entityType;// 事件（点赞、评论等）发生在哪个实体上，entityType代表实体类型（帖子、评论）
+    // 事件（点赞、评论等）发生在哪个实体上，
+    // entityType代表实体类型（帖子、评论）int ENTITY_TYPE_POST = 1; ENTITY_TYPE_COMMENT = 2;
+    private int entityType;
     private int entityId;   //实体的id，如帖子id,评论id
-    private int entityUserId;  //这个实体的作者
-    private Map<String, Object> data = new HashMap<>();  //后续处理其他事件时，存特殊数据；现在还不知道到底用什么类型来封装，就用map
+    private int entityUserId;  //这个实体的作者（如帖子、作者）
+    //后续处理其他事件时，存特殊数据；现在还不知道到底用什么类型来封装，就用map
+    private Map<String, Object> data = new HashMap<>();
 
     public String getTopic() {
         return topic;

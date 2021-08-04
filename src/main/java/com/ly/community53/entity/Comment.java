@@ -8,12 +8,12 @@ import java.util.Date;
  */
 public class Comment {
     private int id;
-    private int userId;
-    private int entityType;
-    private int entityId;
-    private int targetId;
+    private int userId;         // 评论的 作者
+    private int entityType;  //  --评论/点赞的目标类型 1-帖子；2-评论；3-课程；之类
+    private int entityId;  // --评论/点赞的实体(如帖子/评论)的id;entityType=1 时，entityId为帖子id，entityType=2时，entityId为评论id
+    private int targetId;    //--评论指向的人
     private String content;
-    private int status;
+    private int status;      //-- status == 0，代表评论有效，才可以被查询出来
     private Date createTime;
 
     public int getId() {

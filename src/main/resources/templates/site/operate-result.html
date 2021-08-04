@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
+	<link rel="icon" th:href="@{/img/53icon.ico}"/>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
 	<title>53论坛-操作结果</title>
@@ -65,6 +65,7 @@
 					<p class="lead" th:text="${msg}">您的账号已经激活成功,可以正常使用了!</p>
 					<hr class="my-4">
 					<p>
+<!--						这个8s自动跳转，是该页面下末尾js代码控制的-->
 						系统会在 <span id="seconds" class="text-danger">8</span> 秒后自动跳转,
 						您也可以点此 <a id="target" th:href="@{${target}}" class="text-primary">链接</a>, 手动跳转!
 					</p>
@@ -73,7 +74,7 @@
 		</div>
 
 		<!-- 尾部 -->
-		<footer class="bg-dark">
+		<footer class="bg-dark" th:replace="index::footer">
 			<div class="container">
 				<div class="row">
 					<!-- 二维码 -->

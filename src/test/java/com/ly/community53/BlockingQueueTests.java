@@ -51,7 +51,7 @@ class Consumer implements Runnable {
     public void run() {
         try {
             while (true) {//有数据，就一直消费
-                //大概率sleep大于20ms, 故消费者线程处理能力 没生产者线程处理能力那么强
+                //消费者睡眠[0,1000]ms随机时间，生产者睡眠20ms，消费者大概率sleep大于生产者, 故消费者线程处理能力 没生产者线程处理能力那么强
                 Thread.sleep(new Random().nextInt(1000));
                 queue.take();
                 System.out.println(Thread.currentThread().getName() + "消费:" + queue.size());

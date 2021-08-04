@@ -15,9 +15,10 @@
         function send() {
             <!--    $.get、$.post、$.ajax；$.post有三个参数：访问路径、提交的值、匿名回调函数-->
             $.post(
-                "/community53/alpha/ajax",
-                {"name":"张三","age":23},
-                function(data) {
+            <!-- "/community53/alpha/ajax", 访问路径  后期少了community53了-->
+                "/alpha/ajax", <!-- 访问路径-->
+                {"name":"张三","age":23}, <!-- 提交的值-->
+                function(data) {   <!-- 匿名回调函数-->
                     console.log(typeof(data));
                     console.log(data);
 

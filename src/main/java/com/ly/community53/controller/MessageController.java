@@ -39,7 +39,7 @@ public class MessageController implements CommunityConstant {
     // 私信列表——查询当前用户的会话列表,针对每个会话只返回一条最新的私信
     @RequestMapping(path = "/letter/list", method = RequestMethod.GET)
     public String getLetterList(Model model, Page page) {
-//        Integer.valueOf("abc");//故意写的错误语句，为了到达500.html
+//        Integer.valueOf("abc");  //故意写的错误语句，为了到达500.html
 
         User user = hostHolder.getUser();
         // 分页信息
@@ -174,7 +174,7 @@ public class MessageController implements CommunityConstant {
     public String getNoticeList(Model model) {
         User user = hostHolder.getUser();
 
-        // 查询评论类通知
+        // 查询评论类通知；一旦有人给你评论，就会触发发帖事件；系统会给你发一条通知
         Message message = messageService.findLatestNotice(user.getId(), TOPIC_COMMENT);
         Map<String, Object> messageVO = new HashMap<>(); //用来封装评论类通知
         if (message != null) {
@@ -185,6 +185,9 @@ public class MessageController implements CommunityConstant {
 
             // 对于评论的系统通知message来说 user、entityType、entityId、postId这四个字段，
             // 都放入了message的  Map<String, Object> content字段。（之前从json字符串转过来的）
+            // message.getContent() 对于系统通知：message的content字段如下：{"entityType":2,"entityId":60,"postId":249,"userId":134}
+            // 这些都是even的字段转为json存入message的content字段:{"entityType":2,"entityId":60,"postId":249,"userId":134}
+            // 把一条系统通知需要用到的信息都转为json字符串 存入了message的content字段，具体见EventConsumer对于评论、点赞、关注事件的处理
             messageVO.put("user", userService.findUserById((Integer) data.get("userId")));
             messageVO.put("entityType", data.get("entityType"));
             messageVO.put("entityId", data.get("entityId"));
@@ -205,7 +208,8 @@ public class MessageController implements CommunityConstant {
         messageVO = new HashMap<>();
         if (message != null) {
             messageVO.put("message", message);
-
+            // message.getContent() 对于系统通知：message的content字段如下：{"entityType":2,"entityId":60,"postId":249,"userId":134}
+            // 把一条系统通知需要用到的信息都转为json字符串 存入了message的content字段，具体见EventConsumer对于评论、点赞、关注事件的处理
             String content = HtmlUtils.htmlUnescape(message.getContent());
             Map<String, Object> data = JSONObject.parseObject(content, HashMap.class);//message的String content字段转map
 
@@ -229,7 +233,9 @@ public class MessageController implements CommunityConstant {
         messageVO = new HashMap<>();
         if (message != null) {
             messageVO.put("message", message);
-
+            // message.getContent() 对于系统通知：message的content字段如下：{"entityType":2,"entityId":60,"postId":249,"userId":134}
+            // 这些都是even的字段转为json存入message的content字段:{"entityType":2,"entityId":60,"postId":249,"userId":134}
+            // 把一条系统通知需要用到的信息都转为json字符串 存入了message的content字段，具体见EventConsumer对于评论、点赞、关注事件的处理
             String content = HtmlUtils.htmlUnescape(message.getContent());
             Map<String, Object> data = JSONObject.parseObject(content, HashMap.class);
 
@@ -259,16 +265,16 @@ public class MessageController implements CommunityConstant {
 
 
     //该方法用于点击进入系统通知（点赞、评论、关注三者之一）列表
-    //topic好像确实应该从页面传来，topic从notice.html传来，再进入notice-detail.html
+    //{topic}从页面传来，topic从notice.html传来，再进入notice-detail.html
     //上面getNoticeList方法的model里面有message，message表有conversation_id字段，就是topic
-    //woc，视频直接再notice页面写死了comment  th:href="@{/notice/detail/comment}"
+    //woc，视频直接再notice页面写死了comment  th:href="@{/notice/detail/comment}"  (没毛病，notice.html页面就者3条)
     @RequestMapping(path = "/notice/detail/{topic}", method = RequestMethod.GET)//url的topic从页面哪儿来？？
     public String getNoticeDetail(@PathVariable("topic") String topic, Page page, Model model) {
         User user = hostHolder.getUser();//当前登录用户
-
+        // 点击下一页时，current+1，然后这个current会自动赋值给形参里的page对象； current 是page对象的属性，current就影响了page.getOffset
         page.setLimit(5);
         page.setPath("/notice/detail/" + topic);
-        page.setRows(messageService.findNoticeCount(user.getId(), topic));
+        page.setRows(messageService.findNoticeCount(user.getId(), topic)); // 查询出 评论总数，用于分页
 
         List<Message> noticeList = messageService.findNotices(user.getId(), topic, page.getOffset(), page.getLimit());
         List<Map<String, Object>> noticeVoList = new ArrayList<>();
@@ -295,7 +301,7 @@ public class MessageController implements CommunityConstant {
         model.addAttribute("notices", noticeVoList);
 
         // 设置已读
-        List<Integer> ids = getLetterIds(noticeList);//得到集合中未读消息的id
+        List<Integer> ids = getLetterIds(noticeList);//得到这一页的集合中未读消息的id
         if (!ids.isEmpty()) {
             messageService.readMessage(ids);
         }
